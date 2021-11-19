@@ -7,12 +7,16 @@ from PySide2 import QtCore, QtGui, QtWidgets
 from PySide2.QtCore import Qt, Slot, Signal
 
 # custom event for handling change in freeze state
+
+
 class FreezeEvent(QtCore.QEvent):
     def __init__(self, frozen):
         super().__init__(QtCore.QEvent.User)
         self.frozen = frozen
 
 # custom event for handling button presses
+
+
 class ButtonEvent(QtCore.QEvent):
     def __init__(self, btn, clicks):
         super().__init__(QtCore.QEvent.Type(QtCore.QEvent.User + 1))
@@ -20,11 +24,15 @@ class ButtonEvent(QtCore.QEvent):
         self.clicks = clicks
 
 # custom event for handling new images
+
+
 class ImageEvent(QtCore.QEvent):
     def __init__(self):
         super().__init__(QtCore.QEvent.Type(QtCore.QEvent.User + 2))
 
 # manages custom events posted from callbacks, then relays as signals to the main widget
+
+
 class Signaller(QtCore.QObject):
     freeze = QtCore.Signal(bool)
     button = QtCore.Signal(int, int)
@@ -43,10 +51,13 @@ class Signaller(QtCore.QObject):
             self.image.emit(self.usimage)
         return True
 
+
 # global required for the cast api callbacks
 signaller = Signaller()
 
 # draws the ultrasound image
+
+
 class ImageView(QtWidgets.QGraphicsView):
     def __init__(self, cast):
         QtWidgets.QGraphicsView.__init__(self)
@@ -64,7 +75,7 @@ class ImageView(QtWidgets.QGraphicsView):
         h = evt.size().height()
         self.cast.setOutputSize(w, h)
         self.image = QtGui.QImage(w, h, QtGui.QImage.Format_ARGB32)
-        self.image.fill(QtCore.Qt.black);
+        self.image.fill(QtCore.Qt.black)
         self.setSceneRect(0, 0, w, h)
 
     # black background
@@ -77,6 +88,8 @@ class ImageView(QtWidgets.QGraphicsView):
             painter.drawImage(rect, self.image)
 
 # main widget with controls and ui
+
+
 class MainWidget(QtWidgets.QMainWindow):
     def __init__(self, cast, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent)
@@ -101,7 +114,8 @@ class MainWidget(QtWidgets.QMainWindow):
                     self.statusBar().showMessage("Connected")
                     conn.setText("Disconnect")
                 else:
-                    self.statusBar().showMessage("Failed to connect to {0}".format(ip.text()))
+                    self.statusBar().showMessage(
+                        "Failed to connect to {0}".format(ip.text()))
             else:
                 if cast.disconnect():
                     self.statusBar().showMessage("Disconnected")
@@ -130,7 +144,7 @@ class MainWidget(QtWidgets.QMainWindow):
 
         # get home path
         path = os.path.expanduser("~/")
-        if  cast.init(path, 640, 480):
+        if cast.init(path, 640, 480):
             self.statusBar().showMessage("Initialized")
         else:
             self.statusBar().showMessage("Failed to initialize")
@@ -146,7 +160,8 @@ class MainWidget(QtWidgets.QMainWindow):
     # handles button messages
     @Slot(int, int)
     def button(self, btn, clicks):
-        self.statusBar().showMessage("Button {0} pressed w/ {1} clicks".format(btn, clicks))
+        self.statusBar().showMessage(
+            "Button {0} pressed w/ {1} clicks".format(btn, clicks))
 
     # handles new images
     @Slot(QtGui.QImage)
@@ -159,13 +174,15 @@ class MainWidget(QtWidgets.QMainWindow):
         self.cast.destroy()
         QtWidgets.QApplication.quit()
 
-## called when a new processed image is streamed
+# called when a new processed image is streamed
 # @param image the scan-converted image data
 # @param width width of the image in pixels
 # @param height height of the image in pixels
 # @param bpp bits per pixel
 # @param micronsPerPixel microns per pixel
 # @param timestamp the image timestamp in nanoseconds
+
+
 def newProcessedImage(image, width, height, bpp, micronsPerPixel, timestamp, imu):
     img = QtGui.QImage(image, width, height, QtGui.QImage.Format_ARGB32)
     # a deep copy is important here, as the memory from 'image' won't be valid after the event posting
@@ -174,7 +191,7 @@ def newProcessedImage(image, width, height, bpp, micronsPerPixel, timestamp, imu
     QtCore.QCoreApplication.postEvent(signaller, evt)
     return
 
-## called when a new raw image is streamed
+# called when a new raw image is streamed
 # @param image the raw pre scan-converted image data, uncompressed 8-bit or jpeg compressed
 # @param lines number of lines in the data
 # @param samples number of samples in the data
@@ -183,10 +200,12 @@ def newProcessedImage(image, width, height, bpp, micronsPerPixel, timestamp, imu
 # @param lateral microns per line
 # @param timestamp the image timestamp in nanoseconds
 # @param jpg jpeg compression size if the data is in jpeg format
+
+
 def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg):
     return
 
-## called when a new spectrum image is streamed
+# called when a new spectrum image is streamed
 # @param image the spectral image
 # @param lines number of lines in the spectrum
 # @param samples number of samples per line
@@ -195,32 +214,42 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg):
 # @param micronsPerSample microns per sample for an m spectrum
 # @param velocityPerSample velocity per sample for a pw spectrum
 # @param pw flag that is true for a pw spectrum, false for an m spectrum
+
+
 def newSpectrumImage(image, lines, samples, bps, period, micronsPerSample, velocityPerSample, pw):
     return
 
-## called when freeze state changes
+# called when freeze state changes
 # @param frozen the freeze state
+
+
 def freezeFn(frozen):
     evt = FreezeEvent(frozen)
     QtCore.QCoreApplication.postEvent(signaller, evt)
     return
 
-## called when a button is pressed
+# called when a button is pressed
 # @param button the button that was pressed
 # @param clicks number of clicks performed
+
+
 def buttonsFn(button, clicks):
     evt = ButtonEvent(button, clicks)
     QtCore.QCoreApplication.postEvent(signaller, evt)
     return
 
-## main function
+# main function
+
+
 def main():
-    cast = pycast.Caster(newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn)
+    cast = pycast.Caster(newProcessedImage, newRawImage,
+                         newSpectrumImage, freezeFn, buttonsFn)
     app = QtWidgets.QApplication(sys.argv)
     widget = MainWidget(cast)
     widget.resize(640, 480)
     widget.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
