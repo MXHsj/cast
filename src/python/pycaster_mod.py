@@ -41,7 +41,7 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg):
   else:
     # note! this probably won't work unless a proper decoder is written
     img = Image.frombytes('L', (samples, lines), image, "jpg")
-  # img.save("raw_image.jpg")
+  img.save("raw_image.jpg")
   return
 
 

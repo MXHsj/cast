@@ -1,0 +1,12 @@
+{
+  "python.autoComplete.extraPaths": [
+    "/usr/lib/python3/dist-packages"
+  ],
+  "python.analysis.extraPaths": [
+    "/usr/lib/python3/dist-packages",
+  ],
+  "python.formatting.autopep8Args": [
+    "--max-line-length=110",
+    "--indent-size=2"
+  ]
+}
