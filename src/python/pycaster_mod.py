@@ -126,20 +126,20 @@ def main():
     key = input("press ('q' to quit) ('a' for action): ")
     if key == 'a' or key == 'A':
       key = input("(f)->freeze, (i)->image, (c)->cine, (d/D)->depth, (g/G)->gain: ")
-    if key == 'f' or key == 'F':
-      cast.userFunction(1, 0)
-    elif key == 'i' or key == 'I':
-      cast.userFunction(2, 0)
-    elif key == 'c' or key == 'C':
-      cast.userFunction(3, 0)
-    elif key == 'd':
-      cast.userFunction(4, 0)
-    elif key == 'D':
-      cast.userFunction(5, 0)
-    elif key == 'g':
-      cast.userFunction(6, 0)
-    elif key == 'G':
-      cast.userFunction(7, 0)
+      if key == 'f' or key == 'F':
+        cast.userFunction(1, 0)
+      elif key == 'i' or key == 'I':
+        cast.userFunction(2, 0)
+      elif key == 'c' or key == 'C':
+        cast.userFunction(3, 0)
+      elif key == 'd':
+        cast.userFunction(4, 0)
+      elif key == 'D':
+        cast.userFunction(5, 0)
+      elif key == 'g':
+        cast.userFunction(6, 0)
+      elif key == 'G':
+        cast.userFunction(7, 0)
 
   cast.destroy()
 
