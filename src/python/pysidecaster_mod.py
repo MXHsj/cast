@@ -136,7 +136,8 @@ class MainWidget(QtWidgets.QMainWindow):
     signaller.image.connect(self.image)
 
     # get home path
-    path = os.path.expanduser("~/")
+    # path = os.path.expanduser("~/")
+    path = './'
     if cast.init(path, 640, 480):
       self.statusBar().showMessage("Initialized")
     else:
@@ -181,6 +182,7 @@ def newProcessedImage(image, width, height, bpp, micronsPerPixel, timestamp, imu
   signaller.usimage = img.copy()
   evt = ImageEvent()
   QtCore.QCoreApplication.postEvent(signaller, evt)
+  img.save('processed.jpg')
   return
 
 
