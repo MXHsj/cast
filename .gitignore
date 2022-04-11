@@ -1,5 +1,13 @@
+# exclude libraries
 *.so
+*.dll
+*.lib
+*.pyd
+
+# exclude images
 *.jpeg
 *.jpg
+
+# exclude auto-gen files 
 *.pem
 *.crt
