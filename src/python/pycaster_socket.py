@@ -56,6 +56,7 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg):
 # @param micronsPerSample microns per sample for an m spectrum
 # @param velocityPerSample velocity per sample for a pw spectrum
 # @param pw flag that is true for a pw spectrum, false for an m spectrum
+def newSpectrumImage(image, lines, samples, bps, period, micronsPerSample, velocityPerSample, pw):
   return
 
 
@@ -102,8 +103,7 @@ def main():
   path = './'
 
   # initialize
-  cast = pycast.Caster(newProcessedImage, newRawImage,
-                       newSpectrumImage, freezeFn, buttonsFn)
+  cast = pycast.Caster(newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn)
   ret = cast.init(path, args.width, args.height)
   if ret:
     print("initialization succeeded")
