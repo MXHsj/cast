@@ -24,8 +24,8 @@ processed = None
 # @param timestamp the image timestamp in nanoseconds
 def newProcessedImage(image, width, height, bpp, micronsPerPixel, timestamp, imu):
   global processed
-  print("new image (sc): {0}, {1}x{2} @ {3} bpp, {4:.2f} um/px, imu: {5} pts".
-        format(timestamp, width, height, bpp, micronsPerPixel, len(imu)))
+  # print("new image (sc): {0}, {1}x{2} @ {3} bpp, {4:.2f} um/px, imu: {5} pts".
+  #       format(timestamp, width, height, bpp, micronsPerPixel, len(imu)))
   img = QtGui.QImage(image, width, height, QtGui.QImage.Format_ARGB32)
   # img.save('processed.jpg')
   ptr = img.constBits()
@@ -113,17 +113,18 @@ def main():
     print("initialization failed")
     return
   rospy.init_node('ClariusPublisher', anonymous=True)
-  US_pub = rospy.Publisher('Clarius/US', Image, queue_size=1)
+  US_pub = rospy.Publisher('Clarius/US', Image, queue_size=10)
 
   # loop
   isVisualize = True
   try:
     while not rospy.is_shutdown():
       if processed is not None:
-        US_pub.publish(CvBridge().cv2_to_imgmsg(processed, encoding="passthrough"))
+        bscan = cv2.cvtColor(processed[:, :, 0:3], cv2.COLOR_BGR2GRAY)
+        US_pub.publish(CvBridge().cv2_to_imgmsg(bscan, encoding="passthrough"))
         if isVisualize:
-          cv2.imshow('processed image', processed)
-      key = cv2.waitKey(10)
+          cv2.imshow('processed image', bscan)
+      key = cv2.waitKey(1)
       if key == ord('q'):
         break
   except KeyboardInterrupt:
