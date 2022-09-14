@@ -6,13 +6,15 @@ import pycast
 import argparse
 from cv2 import cv2
 from PySide2 import QtCore, QtGui, QtWidgets
+
+import time
 import rospy
 import numpy as np
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 
 
-processed = None
+processed = np.zeros((480, 640, 4), dtype=np.uint8)
 
 
 # called when a new processed image is streamed
@@ -84,6 +86,7 @@ def main():
   parser.add_argument('--port', '-p', dest='port', type=int, help='port of the probe', required=True)
   parser.add_argument('--width', '-w', dest='width', type=int, help='image output width in pixels')
   parser.add_argument('--height', '-ht', dest='height', type=int, help='image output height in pixels')
+  parser.add_argument('--vis', '-vi', dest='vis', action='store_true', help='is show real time image')
   parser.set_defaults(ip=None)
   parser.set_defaults(port=None)
   parser.set_defaults(width=640)
@@ -113,20 +116,24 @@ def main():
     print("initialization failed")
     return
   rospy.init_node('ClariusPublisher', anonymous=True)
-  US_pub = rospy.Publisher('Clarius/US', Image, queue_size=10)
+  US_pub = rospy.Publisher('Clarius/US', Image, queue_size=100)
+  freq = 20
+  rate = rospy.Rate(freq)
 
   # loop
-  isVisualize = True
   try:
     while not rospy.is_shutdown():
-      if processed is not None:
-        bscan = cv2.cvtColor(processed[:, :, 0:3], cv2.COLOR_BGR2GRAY)
-        US_pub.publish(CvBridge().cv2_to_imgmsg(bscan, encoding="passthrough"))
-        if isVisualize:
-          cv2.imshow('processed image', bscan)
+      t_start = time.perf_counter()
+      bscan = cv2.cvtColor(processed[:, :, 0:3], cv2.COLOR_BGR2GRAY)
+      US_pub.publish(CvBridge().cv2_to_imgmsg(bscan, encoding="passthrough"))
+      if args.vis:
+        cv2.imshow('processed image', bscan)
       key = cv2.waitKey(1)
       if key == ord('q'):
         break
+      rate.sleep()
+      t_end = time.perf_counter()
+      # print(f'total time elapsed: {t_end-t_start}')
   except KeyboardInterrupt:
     print('terminated by user')
 
