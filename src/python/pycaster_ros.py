@@ -4,7 +4,7 @@ publish US image stream to ROS topic
 '''
 import pycast
 import argparse
-from cv2 import cv2
+import cv2
 from PySide2 import QtCore, QtGui, QtWidgets
 
 import time
