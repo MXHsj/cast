@@ -93,7 +93,8 @@ def main():
   parser.set_defaults(height=480)
   args = parser.parse_args()
 
-  if not args.ip or not args.port or args.port < 0:
+  if args.ip is None or args.port is None or args.port < 0:
+    print(f'ip: {not args.ip}, port: {not args.port}, {args.port<0}')
     print("one or more arguments are invalid")
     parser.print_usage()
     return
